@@ -1,5 +1,5 @@
 import Head from 'next/head';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import AnalogueClock from 'react-analogue-clock';
 import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from '@date-io/date-fns';
@@ -7,7 +7,7 @@ import DateFnsUtils from '@date-io/date-fns';
 import { createMuiTheme } from '@material-ui/core/styles';
 import { ThemeProvider } from '@material-ui/core/styles';
 import blue from '@material-ui/core/colors/blue';
-import { Button } from '@material-ui/core';
+import { Button, InputAdornment, TextField } from '@material-ui/core';
 import { useRouter } from 'next/router'
 const customTheme = createMuiTheme({
   palette: {
@@ -25,13 +25,13 @@ const Home: React.FC = () => {
   const [endPrice, setEndPrice] = useState('120');
 
   const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date(new Date().setHours(new Date().getHours() + 2)));
+  const [endDate, setEndDate] = useState(new Date(new Date().setHours(new Date().getHours() + 24)));
 
   const [unit, setUnit] = useState('€/h')
 
   const [url, setUrl] = useState<string | undefined>();
 
-  const clockOptions = {
+  const [clockOptions, setClockOptions] = useState({
     baseColor: 'rgba(255,255,255,0)',
     borderColor: 'rgba(255,255,255,0)',
     borderWidth: 1,
@@ -45,8 +45,17 @@ const Home: React.FC = () => {
     numbersColor: '#000000',
     showNumbers: false,
     size: 300
-  }
-  
+  })
+
+  useEffect(() => {
+    const clockSize = window.screen.width > 500 ? 300 : 150;
+    setClockOptions((prev) => {
+      let newOptions = { ...prev };
+      newOptions.size = clockSize;
+      return newOptions;
+    })
+  }, [])
+
   const generateUrl = () => {
     console.log(window.location.href)
     setUrl(`${window.location.href}${encodeURIComponent(startPrice)}/${encodeURIComponent(startDate.toISOString())}/${encodeURIComponent(endPrice)}/${encodeURIComponent(endDate.toISOString())}/${encodeURIComponent(unit)}`)
@@ -134,55 +143,75 @@ const Home: React.FC = () => {
           </div>
           <div className="absolute top-0 left-0 flex flex-col h-screen w-screen">
 
-            <div className="flex-1 p-4 m-auto">
+            <div className="flex-1 p-4 m-auto mb-6">
               <AnalogueClock {...clockOptions} />
             </div>
 
             <div className="m-auto text-center">
-              <div className='flex justify-items-center text-3xl my-6'>
+              <div className='flex flex-col md:flex-row justify-items-center text-xl mb-6'>
                 <div className='flex-1' />
                 <div className='self-center'>
                   Unit:
                 </div>
-                <div className='self-center px-2'>→</div>
-                <div className='self-center'>{unit}</div>
+                <div className='self-center px-2 hidden md:block'>→</div>
+                <div className='self-center'>
+                  <TextField id="start-price" value={unit} onChange={(e) => setUnit(e.target.value)} />
+                </div>
                 <div className='flex-1' />
               </div>
 
-              <div className='flex justify-items-center text-3xl my-6'>
+              <div className='flex flex-col md:flex-row justify-items-center text-xl mb-14 md:mb-6'>
                 <div className='flex-1' />
-                <div className='self-center'>
+                <div className='self-center mb-4 md:mb-0'>
                   <DateTimePicker
-                    //label="StartDate"
                     inputVariant="outlined"
                     value={startDate}
                     onChange={setStartDate}
                   />
                 </div>
-                <div className='self-center px-2'>→</div>
-                <div className='self-center'>{startPrice}{unit}</div>
+                <div className='self-center px-2 hidden md:block'>→</div>
+                <div className='self-center'>
+                  <TextField id="start-price"
+                    value={startPrice} onChange={(e) => setStartPrice(e.target.value)}
+                    type="number"
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">{unit}</InputAdornment>,
+                    }}
+                  />
+                </div>
                 <div className='flex-1' />
               </div>
 
-              <div className='flex justify-items-center text-3xl my-6'>
+              <div className='flex flex-col md:flex-row justify-items-center text-xl mb-10 md:mb-6'>
                 <div className='flex-1' />
-                <div className='self-center'>
+                <div className='self-center mb-4 md:mb-0'>
                   <DateTimePicker
-                    //label="EndDate"
                     inputVariant="outlined"
                     value={endDate}
                     onChange={setEndDate}
                   />
                 </div>
-                <div className='self-center px-2'>→</div>
-                <div className='self-center'>{endPrice}{unit}</div>
+                <div className='self-center px-2 hidden md:block'>→</div>
+                <div className='self-center'>
+                  <TextField
+                    id="end-price"
+                    value={endPrice} onChange={(e) => setEndPrice(e.target.value)}
+                    type="number"
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">{unit}</InputAdornment>,
+                    }}
+                  />
+                </div>
                 <div className='flex-1' />
               </div>
             </div>
 
             <div className="m-auto text-center">
-              <div className='self-center'><Button onClick={generateUrl}>Generate Url</Button></div>
-              <div className='self-center'><a href={url}>{`${url}`}</a></div>
+              <div className='self-center mb-5'><Button variant="outlined" onClick={generateUrl}>Generate Url</Button></div>
+              {
+                url &&
+                <div className='self-center'><a href={url}>{`${url}`}</a></div>
+              }
             </div>
             <div className="flex-1" />
 
