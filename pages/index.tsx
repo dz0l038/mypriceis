@@ -192,7 +192,7 @@ const Home: React.FC = () => {
                   />
                 </div>
                 <div className='self-center px-2 hidden md:block'>→</div>
-                <div className='self-center'>
+                <div className='self-center break-all'>
                   <TextField
                     id="end-price"
                     value={endPrice} onChange={(e) => setEndPrice(e.target.value)}
@@ -210,7 +210,7 @@ const Home: React.FC = () => {
               <div className='self-center mb-5'><Button variant="outlined" onClick={generateUrl}>Generate Url</Button></div>
               {
                 url &&
-                <div className='self-center'><a href={url}>{`${url}`}</a></div>
+                <div className='self-center break-all'><a href={url}>{`${url}`}</a></div>
               }
             </div>
             <div className="flex-1" />

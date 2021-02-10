@@ -140,7 +140,7 @@ const Home: React.FC = () => {
           currentPrice &&
           <div className="m-auto text-center">
             <h3 className="text-3xl">My price is</h3>
-            <h1 className="text-6xl md:text-9xl text-gray-700">{`${currentPrice}${unit}`}</h1>
+            <p className="text-6xl md:text-9xl text-gray-700 break-all">{`${currentPrice} ${unit}`}</p>
           </div>
         }
 
